@@ -1,10 +1,74 @@
 package br.tp2.dojo2;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Biblioteca {
-    public Biblioteca() {
+    private static final ArrayList<Cliente> clientes = new ArrayList<>();
 
+    public Biblioteca() {
+    }
+
+    private void novoCliente() {
+        Cliente cliente = new Cliente();
+        cliente = cliente.novoRegistro();
+
+        if (cliente != null) {
+            adicionaCliente(cliente);
+            System.out.println("Cadastro de cliente realizado com sucesso.");
+        }
+    }
+
+    private void removeCliente() {
+        Cliente cliente = new Cliente();
+        cliente = cliente.removeRegistro();
+
+        if (cliente != null) {
+            removeCliente(cliente);
+            System.out.println("Exclusão de cliente realizada com sucesso.");
+        }
+    }
+
+    private boolean administraMenuClientes(int opcao) {
+        switch (opcao) {
+            case 1:
+                novoCliente();
+                break;
+            case 2:
+                removeCliente();
+                break;
+            case 3:
+                break;
+
+            default:
+                System.out.println("\nOpção inválida");
+                return false;
+        }
+
+        return true;
+    }
+
+    private void menuClientes() {
+        int opcao;
+        Scanner scanner = new Scanner(System.in);
+        boolean opcaoValida;
+
+        System.out.println("""
+             * * * * * * * * * * * * * * * * * * * *
+            CLIENTES
+            Escolha uma das opções abaixo
+
+            1. Novo cliente
+            2. Remover cliente
+            3. Voltar ao menu inicial
+            """);
+
+        do {
+            System.out.println("Digite a opção desejada:");
+            opcao = scanner.nextInt();
+
+            opcaoValida = administraMenuClientes(opcao);
+        } while (!opcaoValida);
     }
 
     private boolean administraMenuPrincipal(int opcao) {
@@ -13,7 +77,7 @@ public class Biblioteca {
                 System.out.println("\nMenu Aluguéis\n");
                 break;
             case 2:
-                System.out.println("\nMenu Clientes\n");
+                menuClientes();
                 break;
             case 3:
                 System.out.println("\nMenu Livros\n");
@@ -58,5 +122,17 @@ public class Biblioteca {
                 opcaoValida = administraMenuPrincipal(opcao);
             } while (!opcaoValida);
         } while (opcao != 5);
+    }
+
+    public ArrayList<Cliente> getClientes() {
+        return clientes;
+    }
+
+    private void adicionaCliente(Cliente cliente) {
+        clientes.add(cliente);
+    }
+
+    private void removeCliente(Cliente cliente) {
+        clientes.remove(cliente);
     }
 }
