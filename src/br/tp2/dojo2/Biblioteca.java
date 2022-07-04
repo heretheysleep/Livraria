@@ -5,8 +5,71 @@ import java.util.Scanner;
 
 public class Biblioteca {
     private static final ArrayList<Cliente> clientes = new ArrayList<>();
+    private static final ArrayList<Livro> livros = new ArrayList<>();
 
     public Biblioteca() {
+    }
+
+    private void novoLivro() {
+        Livro livro = new Livro();
+        livro = livro.novoRegistro();
+
+        if (livro != null) {
+            adicionaLivro(livro);
+            System.out.println("\nCadastro de livro realizado com sucesso.");
+        }
+    }
+
+    private void removeLivro() {
+        Livro livro = new Livro();
+        livro = livro.removeRegistro();
+
+        if (livro != null) {
+            removeLivro(livro);
+            System.out.println("\nExclusão de livro realizada com sucesso.");
+        }
+    }
+
+    private boolean administraMenuLivros(int opcao) {
+        switch (opcao) {
+            case 1:
+                novoLivro();
+                break;
+            case 2:
+                removeLivro();
+                break;
+            case 3:
+                break;
+
+            default:
+                System.out.println("\nOpção inválida");
+                return false;
+        }
+
+        return true;
+    }
+
+    private void menuLivros() {
+        int opcao;
+        Scanner scanner = new Scanner(System.in);
+        boolean opcaoValida;
+
+        System.out.println("""
+             * * * * * * * * * * * * * * * * * * * *
+            LIVROS
+            Escolha uma das opções abaixo
+
+            1. Novo livro
+            2. Remover livro
+            3. Voltar ao menu inicial
+            """);
+
+        do {
+            System.out.println("Digite a opção desejada:");
+            opcao = scanner.nextInt();
+
+            opcaoValida = administraMenuLivros(opcao);
+        } while (!opcaoValida);
     }
 
     private void novoCliente() {
@@ -15,7 +78,7 @@ public class Biblioteca {
 
         if (cliente != null) {
             adicionaCliente(cliente);
-            System.out.println("Cadastro de cliente realizado com sucesso.");
+            System.out.println("\nCadastro de cliente realizado com sucesso.");
         }
     }
 
@@ -25,7 +88,7 @@ public class Biblioteca {
 
         if (cliente != null) {
             removeCliente(cliente);
-            System.out.println("Exclusão de cliente realizada com sucesso.");
+            System.out.println("\nExclusão de cliente realizada com sucesso.");
         }
     }
 
@@ -80,7 +143,7 @@ public class Biblioteca {
                 menuClientes();
                 break;
             case 3:
-                System.out.println("\nMenu Livros\n");
+                menuLivros();
                 break;
             case 4:
                 System.out.println("\nMenu Relatórios\n");
@@ -134,5 +197,17 @@ public class Biblioteca {
 
     private void removeCliente(Cliente cliente) {
         clientes.remove(cliente);
+    }
+
+    public ArrayList<Livro> getLivros() {
+        return livros;
+    }
+
+    private void adicionaLivro(Livro livro) {
+        livros.add(livro);
+    }
+
+    private void removeLivro(Livro livro) {
+        livros.remove(livro);
     }
 }

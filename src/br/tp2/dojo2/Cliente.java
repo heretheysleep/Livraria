@@ -50,7 +50,7 @@ public class Cliente {
 
         do {
             System.out.println("Nome:");
-            nome = scanner.next();
+            nome = scanner.nextLine();
 
             if (nome.length() == 0)
                 System.out.println("Nome inválido");
@@ -73,7 +73,7 @@ public class Cliente {
         cpf = leCpf();
 
         if (procuraCliente(cpf) != null) {
-            System.out.println("Erro: CPF já cadastrado\nO cadastro de novo cliente foi interrompido.");
+            System.out.println("\nErro: CPF já cadastrado\nO cadastro de novo cliente foi interrompido.");
             return null;
         }
 
@@ -92,7 +92,7 @@ public class Cliente {
         cliente = procuraCliente(leCpf());
 
         if (cliente == null)
-            System.out.println("Erro: CPF não cadastrado\nA exclusão de cliente foi interrompida.");
+            System.out.println("\nErro: CPF não cadastrado\nA exclusão de cliente foi interrompida.");
 
         return cliente;
     }
