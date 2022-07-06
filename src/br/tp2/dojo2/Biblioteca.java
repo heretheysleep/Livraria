@@ -10,6 +10,56 @@ public class Biblioteca {
     public Biblioteca() {
     }
 
+    private void novoAluguel() {
+
+    }
+
+    private void devolveLivro() {
+
+    }
+
+    private boolean administraMenuAlugueis(int opcao) {
+        switch (opcao) {
+            case 1:
+                novoLivro();
+                break;
+            case 2:
+                removeLivro();
+                break;
+            case 3:
+                break;
+
+            default:
+                System.out.println("\nOpção inválida");
+                return false;
+        }
+
+        return true;
+    }
+
+    private void menuAlugueis() {
+        int opcao;
+        Scanner scanner = new Scanner(System.in);
+        boolean opcaoValida;
+
+        System.out.println("""
+             * * * * * * * * * * * * * * * * * * * *
+            ALUGUÉIS
+            Escolha uma das opções abaixo
+
+            1. Novo aluguel
+            2. Devolução de livro
+            3. Voltar ao menu inicial
+            """);
+
+        do {
+            System.out.println("Digite a opção desejada:");
+            opcao = scanner.nextInt();
+
+            opcaoValida = administraMenuClientes(opcao);
+        } while (!opcaoValida);
+    }
+
     private void novoLivro() {
         Livro livro = new Livro();
         livro = livro.novoRegistro();
