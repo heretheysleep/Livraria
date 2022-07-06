@@ -8,12 +8,14 @@ public class Livro {
     private String autor;
     private String editora;
     private int anoPublicacao;
+    private boolean disponivel;
 
     public Livro() {
         this.titulo = null;
         this.autor = null;
         this.editora = null;
         this.anoPublicacao = 1900;
+        this.disponivel = true;
     }
 
     public Livro(String titulo, String autor, String editora, int anoPublicacao) {
@@ -21,6 +23,7 @@ public class Livro {
         this.autor = autor;
         this.editora = editora;
         this.anoPublicacao = anoPublicacao;
+        this.disponivel = true;
     }
 
     public Livro procuraLivro(String titulo, String autor) {
@@ -168,5 +171,13 @@ public class Livro {
 
     public void setAnoPublicacao(int anoPublicacao) {
         this.anoPublicacao = anoPublicacao;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel() {
+        this.disponivel = !this.disponivel;
     }
 }

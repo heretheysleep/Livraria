@@ -31,6 +31,39 @@ public class Aluguel {
         this.terminoAluguel = null;
     }
 
+    public boolean novoAluguelPermitido(Cliente cliente) {
+        int contador = 0;
+
+        for (Aluguel aluguel : cliente.getAlugueis()) {
+            if (aluguel.isEmCurso())
+                contador++;
+
+            if (contador == 2)
+                return false;
+        }
+
+        return true;
+    }
+
+    public boolean livroAlugadoRecentemente(Cliente cliente, Livro livro) {
+        int qtdAlugueis = cliente.getAlugueis().size();
+
+        if (qtdAlugueis != 0)
+            for (int index = qtdAlugueis - 1; index >= qtdAlugueis - 3; index--) {
+                Livro registro = new Livro();
+                String titulo, autor;
+
+                titulo = cliente.getAlugueis().get(index).getTituloLivro();
+                autor = cliente.getAlugueis().get(index).getAutorLivro();
+                registro = registro.procuraLivro(titulo, autor);
+
+                if (registro == livro)
+                    return true;
+            }
+
+        return false;
+    }
+
     private Date converteDataString(String data) {
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -82,6 +115,11 @@ public class Aluguel {
             return null;
         }
 
+        if (!novoAluguelPermitido(cliente)) {
+            System.out.println("\nErro: Cliente possui 2 aluguéis em curso\nO cadastro de novo aluguel foi interrompido.");
+            return null;
+        }
+
         titulo = livro.leTitulo();
         autor = livro.leAutor();
 
@@ -89,6 +127,16 @@ public class Aluguel {
 
         if (livro == null) {
             System.out.println("\nErro: Livro não cadastrado\nO cadastro de novo aluguel foi interrompido.");
+            return null;
+        }
+
+        if (!livro.isDisponivel()) {
+            System.out.println("\nErro: Livro não disponível\nO cadastro de novo aluguel foi interrompido.");
+            return null;
+        }
+
+        if (livroAlugadoRecentemente(cliente, livro)) {
+            System.out.println("\nErro: Livro alugado recentemente\nO cadastro de novo aluguel foi interrompido.");
             return null;
         }
 

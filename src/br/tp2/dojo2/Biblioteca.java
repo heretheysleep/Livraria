@@ -16,9 +16,14 @@ public class Biblioteca {
 
         if (aluguel != null) {
             Cliente cliente = new Cliente();
+            Livro livro = new Livro();
+
             cliente = cliente.procuraCliente(aluguel.getCpf());
+            livro = livro.procuraLivro(aluguel.getTituloLivro(), aluguel.getAutorLivro());
 
             clientes.get(clientes.indexOf(cliente)).adicionaAluguel(aluguel);
+            livros.get(livros.indexOf(livro)).setDisponivel();
+            
             System.out.println("\nAluguel de livro realizado com sucesso.");
         }
     }
