@@ -23,7 +23,7 @@ public class Livro {
         this.anoPublicacao = anoPublicacao;
     }
 
-    private Livro procuraLivro(String titulo, String autor) {
+    public Livro procuraLivro(String titulo, String autor) {
         Biblioteca biblioteca = new Biblioteca();
 
         for (Livro livro : biblioteca.getLivros())
@@ -33,7 +33,7 @@ public class Livro {
         return null;
     }
 
-    private String leTitulo() {
+    public String leTitulo() {
         String titulo;
         Scanner scanner = new Scanner(System.in);
 
@@ -50,7 +50,7 @@ public class Livro {
         return titulo;
     }
 
-    private String leAutor() {
+    public String leAutor() {
         String autor;
         Scanner scanner = new Scanner(System.in);
 

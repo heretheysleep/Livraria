@@ -11,7 +11,16 @@ public class Biblioteca {
     }
 
     private void novoAluguel() {
+        Aluguel aluguel = new Aluguel();
+        aluguel = aluguel.novoRegistro();
 
+        if (aluguel != null) {
+            Cliente cliente = new Cliente();
+            cliente = cliente.procuraCliente(aluguel.getCpf());
+
+            clientes.get(clientes.indexOf(cliente)).adicionaAluguel(aluguel);
+            System.out.println("\nAluguel de livro realizado com sucesso.");
+        }
     }
 
     private void devolveLivro() {
@@ -21,10 +30,10 @@ public class Biblioteca {
     private boolean administraMenuAlugueis(int opcao) {
         switch (opcao) {
             case 1:
-                novoLivro();
+                novoAluguel();
                 break;
             case 2:
-                removeLivro();
+                devolveLivro();
                 break;
             case 3:
                 break;
@@ -56,7 +65,7 @@ public class Biblioteca {
             System.out.println("Digite a opção desejada:");
             opcao = scanner.nextInt();
 
-            opcaoValida = administraMenuClientes(opcao);
+            opcaoValida = administraMenuAlugueis(opcao);
         } while (!opcaoValida);
     }
 
@@ -187,7 +196,7 @@ public class Biblioteca {
     private boolean administraMenuPrincipal(int opcao) {
         switch (opcao) {
             case 1:
-                System.out.println("\nMenu Aluguéis\n");
+                menuAlugueis();
                 break;
             case 2:
                 menuClientes();
