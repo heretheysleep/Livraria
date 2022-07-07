@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Biblioteca {
     private static final ArrayList<Cliente> clientes = new ArrayList<>();
     private static final ArrayList<Livro> livros = new ArrayList<>();
+    private static final ArrayList<Aluguel> alugueis = new ArrayList<>();
 
     public Biblioteca() {
     }
@@ -15,21 +16,29 @@ public class Biblioteca {
         aluguel = aluguel.novoRegistro();
 
         if (aluguel != null) {
-            Cliente cliente = new Cliente();
             Livro livro = new Livro();
-
-            cliente = cliente.procuraCliente(aluguel.getCpf());
             livro = livro.procuraLivro(aluguel.getTituloLivro(), aluguel.getAutorLivro());
 
-            clientes.get(clientes.indexOf(cliente)).adicionaAluguel(aluguel);
+            adicionaAluguel(aluguel);
             livros.get(livros.indexOf(livro)).setDisponivel();
-            
+
             System.out.println("\nAluguel de livro realizado com sucesso.");
         }
     }
 
     private void devolveLivro() {
+        Aluguel aluguel = new Aluguel();
+        aluguel = aluguel.finalizaAluguel();
 
+        if (aluguel != null) {
+            Livro livro = new Livro();
+            livro = livro.procuraLivro(aluguel.getTituloLivro(), aluguel.getAutorLivro());
+
+            devolveLivro(aluguel);
+            livros.get(livros.indexOf(livro)).setDisponivel();
+
+            System.out.println("\nDevolução de livro realizada com sucesso.");
+        }
     }
 
     private boolean administraMenuAlugueis(int opcao) {
@@ -273,5 +282,19 @@ public class Biblioteca {
 
     private void removeLivro(Livro livro) {
         livros.remove(livro);
+    }
+
+    public ArrayList<Aluguel> getAlugueis() {
+        return alugueis;
+    }
+
+    public void adicionaAluguel(Aluguel aluguel) {
+        alugueis.add(aluguel);
+    }
+
+    public void devolveLivro(Aluguel aluguel) {
+        for (Aluguel registro : alugueis)
+            if (registro == aluguel)
+                alugueis.get(alugueis.indexOf(registro)).setEmCurso();
     }
 }

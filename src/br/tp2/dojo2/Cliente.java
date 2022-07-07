@@ -1,13 +1,11 @@
 package br.tp2.dojo2;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Cliente {
     private final String cpf;
     private String nome;
-    private final ArrayList<Aluguel> alugueis = new ArrayList<>();
 
     public Cliente() {
         this.cpf = null;
@@ -109,19 +107,5 @@ public class Cliente {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public ArrayList<Aluguel> getAlugueis() {
-        return alugueis;
-    }
-
-    public void adicionaAluguel(Aluguel aluguel) {
-        alugueis.add(aluguel);
-    }
-
-    public void devolveLivro(Aluguel aluguel) {
-        for (Aluguel registro : alugueis)
-            if (registro == aluguel)
-                alugueis.get(alugueis.indexOf(registro)).setEmCurso();
     }
 }

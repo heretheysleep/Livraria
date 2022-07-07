@@ -2,7 +2,9 @@ package br.tp2.dojo2;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Aluguel {
@@ -31,10 +33,21 @@ public class Aluguel {
         this.terminoAluguel = null;
     }
 
-    public boolean novoAluguelPermitido(Cliente cliente) {
+    public ArrayList<Aluguel> refinaListaAlugueisCliente(String cpf) {
+        Biblioteca biblioteca = new Biblioteca();
+        ArrayList<Aluguel> resultados = new ArrayList<>();
+
+        for (Aluguel aluguel : biblioteca.getAlugueis())
+            if (Objects.equals(aluguel.getCpf(), cpf))
+                resultados.add(aluguel);
+
+        return resultados;
+    }
+
+    public boolean novoAluguelPermitido(ArrayList<Aluguel> alugueis) {
         int contador = 0;
 
-        for (Aluguel aluguel : cliente.getAlugueis()) {
+        for (Aluguel aluguel : alugueis) {
             if (aluguel.isEmCurso())
                 contador++;
 
@@ -45,16 +58,17 @@ public class Aluguel {
         return true;
     }
 
-    public boolean livroAlugadoRecentemente(Cliente cliente, Livro livro) {
-        int qtdAlugueis = cliente.getAlugueis().size();
+    public boolean livroAlugadoRecentemente(Livro livro, ArrayList<Aluguel> alugueis) {
+        int qtdAlugueis = alugueis.size();
 
         if (qtdAlugueis != 0)
-            for (int index = qtdAlugueis - 1; index >= qtdAlugueis - 3; index--) {
+            for (int index = qtdAlugueis - 1; (index >= qtdAlugueis -3) && (index >= 0); index--) {
                 Livro registro = new Livro();
                 String titulo, autor;
 
-                titulo = cliente.getAlugueis().get(index).getTituloLivro();
-                autor = cliente.getAlugueis().get(index).getAutorLivro();
+                titulo = alugueis.get(index).getTituloLivro();
+                autor = alugueis.get(index).getAutorLivro();
+
                 registro = registro.procuraLivro(titulo, autor);
 
                 if (registro == livro)
@@ -74,13 +88,13 @@ public class Aluguel {
         }
     }
 
-    private Date leData() {
+    private Date leData(String momento) {
         String input;
         Scanner scanner = new Scanner(System.in);
         Date data;
 
         do {
-            System.out.println("Data de início de aluguel:");
+            System.out.println("Data de " + momento + " de aluguel:");
             input = scanner.next();
 
             data = converteDataString(input);
@@ -98,6 +112,7 @@ public class Aluguel {
         Cliente cliente = new Cliente();
         Livro livro = new Livro();
         String cpf, titulo, autor;
+        ArrayList<Aluguel> alugueisCliente;
         Date data;
 
         System.out.println("""
@@ -107,7 +122,6 @@ public class Aluguel {
                 """);
 
         cpf = cliente.leCpf();
-
         cliente = cliente.procuraCliente(cpf);
 
         if (cliente == null) {
@@ -115,7 +129,9 @@ public class Aluguel {
             return null;
         }
 
-        if (!novoAluguelPermitido(cliente)) {
+        alugueisCliente = refinaListaAlugueisCliente(cpf);
+
+        if (!novoAluguelPermitido(alugueisCliente)) {
             System.out.println("\nErro: Cliente possui 2 aluguéis em curso\nO cadastro de novo aluguel foi interrompido.");
             return null;
         }
@@ -135,14 +151,71 @@ public class Aluguel {
             return null;
         }
 
-        if (livroAlugadoRecentemente(cliente, livro)) {
+        if (livroAlugadoRecentemente(livro, alugueisCliente)) {
             System.out.println("\nErro: Livro alugado recentemente\nO cadastro de novo aluguel foi interrompido.");
             return null;
         }
 
-        data = leData();
+        data = leData("início");
 
         return new Aluguel(cpf, titulo, autor, data);
+    }
+
+    public Aluguel procuraAluguel(String cpf, String titulo, String autor) {
+        Biblioteca biblioteca = new Biblioteca();
+
+        for (Aluguel aluguel : biblioteca.getAlugueis())
+            if (Objects.equals(aluguel.getCpf(), cpf) &&
+                    Objects.equals(aluguel.getTituloLivro(), titulo) &&
+                    Objects.equals(aluguel.getAutorLivro(), autor) &&
+                    aluguel.isEmCurso())
+                return aluguel;
+
+        return null;
+    }
+
+    public Aluguel finalizaAluguel() {
+        Cliente cliente = new Cliente();
+        Livro livro = new Livro();
+        String cpf, titulo, autor;
+        Aluguel aluguel = new Aluguel();
+        Date data;
+
+        System.out.println("""
+                 * * * * * * * * * * * * * * * * * * * *
+                DEVOLUÇÃO DE LIVRO
+                Preencha os dados abaixo
+                """);
+
+        cpf = cliente.leCpf();
+        cliente = cliente.procuraCliente(cpf);
+
+        if (cliente == null) {
+            System.out.println("\nErro: Cliente não cadastrado\nA devolução de livro foi interrompida.");
+            return null;
+        }
+
+        titulo = livro.leTitulo();
+        autor = livro.leAutor();
+
+        livro = livro.procuraLivro(titulo, autor);
+
+        if (livro == null) {
+            System.out.println("\nErro: Livro não cadastrado\nA devolução de livro foi interrompida.");
+            return null;
+        }
+
+        aluguel = aluguel.procuraAluguel(cpf, titulo, autor);
+
+        if (aluguel == null) {
+            System.out.println("\nErro: Aluguel em andamento não existe\nA devolução de livro foi interrompida.");
+            return null;
+        }
+
+        data = leData("término");
+        aluguel.setTerminoAluguel(data);
+
+        return aluguel;
     }
 
     public String getCpf() {
