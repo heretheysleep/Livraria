@@ -2,10 +2,7 @@ package br.tp2.dojo2;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Aluguel {
     private final String cpf;
@@ -88,7 +85,7 @@ public class Aluguel {
         }
     }
 
-    private Date leData(String momento) {
+    private Date leData(String momento, Date dataInicio, int anoPublicacao) {
         String input;
         Scanner scanner = new Scanner(System.in);
         Date data;
@@ -99,7 +96,9 @@ public class Aluguel {
 
             data = converteDataString(input);
 
-            if (data == null)
+            if (data == null ||
+                    (dataInicio != null && data.before(dataInicio)) ||
+                    data.getYear() < anoPublicacao)
                 System.out.println("Data inválida");
             else
                 break;
@@ -156,7 +155,7 @@ public class Aluguel {
             return null;
         }
 
-        data = leData("início");
+        data = leData("início", null, livro.getAnoPublicacao());
 
         return new Aluguel(cpf, titulo, autor, data);
     }
@@ -212,7 +211,7 @@ public class Aluguel {
             return null;
         }
 
-        data = leData("término");
+        data = leData("término", aluguel.getInicioAluguel(), livro.getAnoPublicacao());
         aluguel.setTerminoAluguel(data);
 
         return aluguel;

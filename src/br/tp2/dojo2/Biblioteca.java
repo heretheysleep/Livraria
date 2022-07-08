@@ -11,6 +11,48 @@ public class Biblioteca {
     public Biblioteca() {
     }
 
+    private boolean administraMenuRelatorios(int opcao) {
+        switch (opcao) {
+            case 1:
+                novoAluguel();
+                break;
+            case 2:
+                devolveLivro();
+                break;
+            case 3:
+                break;
+
+            default:
+                System.out.println("\nOpção inválida");
+                return false;
+        }
+
+        return true;
+    }
+
+    private void menuRelatorios() {
+        int opcao;
+        Scanner scanner = new Scanner(System.in);
+        boolean opcaoValida;
+
+        System.out.println("""
+             * * * * * * * * * * * * * * * * * * * *
+            RELATÓRIOS
+            Escolha uma das opções abaixo
+
+            1. Filtrar aluguéis por cliente
+            2. Filtrar aluguéis por livro
+            3. Voltar ao menu inicial
+            """);
+
+        do {
+            System.out.println("Digite a opção desejada:");
+            opcao = scanner.nextInt();
+
+            opcaoValida = administraMenuAlugueis(opcao);
+        } while (!opcaoValida);
+    }
+
     private void novoAluguel() {
         Aluguel aluguel = new Aluguel();
         aluguel = aluguel.novoRegistro();
