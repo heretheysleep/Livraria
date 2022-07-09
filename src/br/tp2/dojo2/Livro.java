@@ -40,15 +40,21 @@ public class Livro {
         InterfaceUsuario interfaceUsuario = new InterfaceUsuario();
 
         interfaceUsuario.exibeCabecalhoFormulario("NOVO LIVRO");
-        titulo = utilitario.leTexto("Título");
-        autor = utilitario.leTexto("Autor");
 
-        if (procuraLivro(titulo, autor) != null) {
-            System.out.println("\nErro: Livro já cadastrado\nO cadastro de novo livro foi interrompido.");
+        if (Biblioteca.getAlugueis().size() < 1000) {
+            titulo = utilitario.leTexto("Título");
+            autor = utilitario.leTexto("Autor");
+
+            if (procuraLivro(titulo, autor) != null) {
+                System.out.println("\nErro: Livro já cadastrado\nO cadastro de novo livro foi interrompido.");
+                return null;
+            }
+
+            return new Livro(titulo, autor, utilitario.leTexto("Editora"), utilitario.leAnoPublicacao());
+        } else {
+            System.out.println("Erro: Biblioteca com lotação máxima\nO cadastro de novo livro foi interrompido.");
             return null;
         }
-
-        return new Livro(titulo, autor, utilitario.leTexto("Editora"), utilitario.leAnoPublicacao());
     }
 
     public Livro exclusaoRegistro() {
@@ -59,7 +65,7 @@ public class Livro {
         Aluguel aluguel = new Aluguel();
         ArrayList<Aluguel> alugueis;
 
-        interfaceUsuario.exibeCabecalhoFormulario("EXCLUSÃO DE CLIENTE");
+        interfaceUsuario.exibeCabecalhoFormulario("EXCLUSÃO DE LIVRO");
 
         titulo = utilitario.leTexto("Título");
         autor = utilitario.leTexto("Autor");
@@ -71,7 +77,7 @@ public class Livro {
         alugueis = aluguel.refinaListaAlugueisLivro(titulo, autor);
 
         if (aluguel.aluguelEmCurso(alugueis)) {
-            System.out.println("\nErro: Livro alugado\nA exclusão de cliente foi interrompida.");
+            System.out.println("\nErro: Livro alugado\nA exclusão de livro foi interrompida.");
             return null;
         }
 
@@ -82,32 +88,12 @@ public class Livro {
         return titulo;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
     public String getAutor() {
         return autor;
     }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
-    }
-
-    public String getEditora() {
-        return editora;
-    }
-
-    public void setEditora(String editora) {
-        this.editora = editora;
-    }
-
     public int getAnoPublicacao() {
         return anoPublicacao;
-    }
-
-    public void setAnoPublicacao(int anoPublicacao) {
-        this.anoPublicacao = anoPublicacao;
     }
 
     public boolean isDisponivel() {

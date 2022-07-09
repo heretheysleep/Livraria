@@ -98,9 +98,11 @@ public class Relatorio {
 
             if (alugueis.size() == 0)
                 System.out.println("\nNenhum resultado encontrado.");
-            else
+            else {
+                System.out.println("\n\nRESULTADOS:\n");
+
                 for (int index = 0; index < relatorio.getAlugueis().size(); index++) {
-                    System.out.println(index + 1 + ". REGISTRO");
+                    System.out.println(index + 1 + "º REGISTRO");
 
                     System.out.println("   CPF do cliente: " + relatorio.getAlugueis().get(index).getCpf());
                     System.out.println("   Título do livro: " + relatorio.getAlugueis().get(index).getTituloLivro());
@@ -116,15 +118,8 @@ public class Relatorio {
                     System.out.println("   Data de início do aluguel: " + inicioAluguel);
                     System.out.println("   Data de início do aluguel: " + terminoAluguel);
                 }
+            }
         }
-    }
-
-    public Date getInicioPeriodo() {
-        return inicioPeriodo;
-    }
-
-    public Date getTerminoPeriodo() {
-        return terminoPeriodo;
     }
 
     public ArrayList<Aluguel> getAlugueis() {
