@@ -1,7 +1,7 @@
 package br.tp2.dojo2;
 
+import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Cliente {
     private final String cpf;
@@ -18,81 +18,51 @@ public class Cliente {
     }
 
     public Cliente procuraCliente(String cpf) {
-        Biblioteca biblioteca = new Biblioteca();
-
-        for (Cliente cliente : biblioteca.getClientes())
+        for (Cliente cliente : Biblioteca.getClientes())
             if (Objects.equals(cliente.getCpf(), cpf))
                 return cliente;
 
         return null;
     }
 
-    public String leCpf() {
-        String cpf;
-        Scanner scanner = new Scanner(System.in);
-
-        do {
-            System.out.println("CPF:");
-            cpf = scanner.next();
-
-            if (cpf.length() != 11)
-                System.out.println("CPF inválido");
-            else
-                break;
-        } while (true);
-
-        return cpf;
-    }
-
-    private String leNome() {
-        String nome;
-        Scanner scanner = new Scanner(System.in);
-
-        do {
-            System.out.println("Nome:");
-            nome = scanner.nextLine();
-
-            if (nome.length() == 0)
-                System.out.println("Nome inválido");
-            else
-                break;
-        } while (true);
-
-        return nome;
-    }
-
     public Cliente novoRegistro() {
         String cpf;
+        Utilitario utilitario = new Utilitario();
+        InterfaceUsuario interfaceUsuario = new InterfaceUsuario();
 
-        System.out.println("""
-                 * * * * * * * * * * * * * * * * * * * *
-                NOVO CLIENTE
-                Preencha os dados abaixo
-                """);
-
-        cpf = leCpf();
+        interfaceUsuario.exibeCabecalhoFormulario("NOVO CLIENTE");
+        cpf = utilitario.leCpf();
 
         if (procuraCliente(cpf) != null) {
             System.out.println("\nErro: CPF já cadastrado\nO cadastro de novo cliente foi interrompido.");
             return null;
         }
 
-        return new Cliente(cpf, leNome());
+        return new Cliente(cpf, utilitario.leTexto("Nome"));
     }
 
-    public Cliente removeRegistro() {
+    public Cliente exclusaoRegistro() {
+        String cpf;
         Cliente cliente;
+        Utilitario utilitario = new Utilitario();
+        InterfaceUsuario interfaceUsuario = new InterfaceUsuario();
+        Aluguel aluguel = new Aluguel();
+        ArrayList<Aluguel> alugueis;
 
-        System.out.println("""
-                 * * * * * * * * * * * * * * * * * * * *
-                REMOVER CLIENTE
-                Preencha os dados abaixo
-                """);
+        interfaceUsuario.exibeCabecalhoFormulario("EXCLUSÃO DE CLIENTE");
 
-        cliente = procuraCliente(leCpf());
+        cpf = utilitario.leCpf();
+        cliente = procuraCliente(cpf);
 
         if (cliente == null)
             System.out.println("\nErro: CPF não cadastrado\nA exclusão de cliente foi interrompida.");
+
+        alugueis = aluguel.refinaListaAlugueisCliente(cpf);
+
+        if (aluguel.aluguelEmCurso(alugueis)) {
+            System.out.println("\nErro: Cliente possui aluguel em andamento\nA exclusão de cliente foi interrompida.");
+            return null;
+        }
 
         return cliente;
     }

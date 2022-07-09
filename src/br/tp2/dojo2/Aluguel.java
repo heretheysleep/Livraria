@@ -1,8 +1,8 @@
 package br.tp2.dojo2;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 public class Aluguel {
     private final String cpf;
@@ -17,7 +17,10 @@ public class Aluguel {
         this.tituloLivro = null;
         this.autorLivro = null;
         this.emCurso = false;
-        this.inicioAluguel = converteDataString("01/01/1900");
+
+        Utilitario utilitario = new Utilitario();
+        this.inicioAluguel = utilitario.converteTextoEmData("01/01/1900");
+
         this.terminoAluguel = null;
     }
 
@@ -30,32 +33,18 @@ public class Aluguel {
         this.terminoAluguel = null;
     }
 
-    public ArrayList<Aluguel> refinaListaAlugueisCliente(String cpf) {
-        Biblioteca biblioteca = new Biblioteca();
-        ArrayList<Aluguel> resultados = new ArrayList<>();
+    public Aluguel procuraAluguel(String cpf, String titulo, String autor) {
+        for (Aluguel aluguel : Biblioteca.getAlugueis())
+            if (Objects.equals(aluguel.getCpf(), cpf) &&
+                    Objects.equals(aluguel.getTituloLivro(), titulo) &&
+                    Objects.equals(aluguel.getAutorLivro(), autor) &&
+                    aluguel.isEmCurso())
+                return aluguel;
 
-        for (Aluguel aluguel : biblioteca.getAlugueis())
-            if (Objects.equals(aluguel.getCpf(), cpf))
-                resultados.add(aluguel);
-
-        return resultados;
+        return null;
     }
 
-    public boolean novoAluguelPermitido(ArrayList<Aluguel> alugueis) {
-        int contador = 0;
-
-        for (Aluguel aluguel : alugueis) {
-            if (aluguel.isEmCurso())
-                contador++;
-
-            if (contador == 2)
-                return false;
-        }
-
-        return true;
-    }
-
-    public boolean livroAlugadoRecentemente(Livro livro, ArrayList<Aluguel> alugueis) {
+    private boolean livroAlugadoRecentemente(Livro livro, ArrayList<Aluguel> alugueis) {
         int qtdAlugueis = alugueis.size();
 
         if (qtdAlugueis != 0)
@@ -75,36 +64,47 @@ public class Aluguel {
         return false;
     }
 
-    private Date converteDataString(String data) {
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+    public boolean aluguelEmCurso(ArrayList<Aluguel> alugueis) {
+        for (Aluguel aluguel : alugueis)
+            if (aluguel.isEmCurso())
+                return true;
 
-        try {
-            return formato.parse(data);
-        } catch (ParseException e) {
-            return null;
-        }
+        return false;
     }
 
-    private Date leData(String momento, Date dataInicio, int anoPublicacao) {
-        String input;
-        Scanner scanner = new Scanner(System.in);
-        Date data;
+    private boolean novoAluguelPermitido(ArrayList<Aluguel> alugueis) {
+        int contador = 0;
 
-        do {
-            System.out.println("Data de " + momento + " de aluguel:");
-            input = scanner.next();
+        for (Aluguel aluguel : alugueis) {
+            if (aluguel.isEmCurso())
+                contador++;
 
-            data = converteDataString(input);
+            if (contador == 2)
+                return false;
+        }
 
-            if (data == null ||
-                    (dataInicio != null && data.before(dataInicio)) ||
-                    data.getYear() < anoPublicacao)
-                System.out.println("Data inválida");
-            else
-                break;
-        } while (true);
+        return true;
+    }
 
-        return data;
+    public ArrayList<Aluguel> refinaListaAlugueisCliente(String cpf) {
+        ArrayList<Aluguel> resultados = new ArrayList<>();
+
+        for (Aluguel aluguel : Biblioteca.getAlugueis())
+            if (Objects.equals(aluguel.getCpf(), cpf))
+                resultados.add(aluguel);
+
+        return resultados;
+    }
+
+    public ArrayList<Aluguel> refinaListaAlugueisLivro(String tituloLivro, String autor) {
+        ArrayList<Aluguel> resultados = new ArrayList<>();
+
+        for (Aluguel aluguel : Biblioteca.getAlugueis())
+            if (Objects.equals(aluguel.getTituloLivro(), tituloLivro) &&
+                    Objects.equals(aluguel.getAutorLivro(), autor))
+                resultados.add(aluguel);
+
+        return resultados;
     }
 
     public Aluguel novoRegistro() {
@@ -113,14 +113,12 @@ public class Aluguel {
         String cpf, titulo, autor;
         ArrayList<Aluguel> alugueisCliente;
         Date data;
+        InterfaceUsuario interfaceUsuario = new InterfaceUsuario();
+        Utilitario utilitario = new Utilitario();
 
-        System.out.println("""
-                 * * * * * * * * * * * * * * * * * * * *
-                NOVO ALUGUEL
-                Preencha os dados abaixo
-                """);
+        interfaceUsuario.exibeCabecalhoFormulario("NOVO ALUGUEL");
 
-        cpf = cliente.leCpf();
+        cpf = utilitario.leCpf();
         cliente = cliente.procuraCliente(cpf);
 
         if (cliente == null) {
@@ -135,9 +133,8 @@ public class Aluguel {
             return null;
         }
 
-        titulo = livro.leTitulo();
-        autor = livro.leAutor();
-
+        titulo = utilitario.leTexto("Título");
+        autor = utilitario.leTexto("Autor");
         livro = livro.procuraLivro(titulo, autor);
 
         if (livro == null) {
@@ -155,38 +152,32 @@ public class Aluguel {
             return null;
         }
 
-        data = leData("início", null, livro.getAnoPublicacao());
+        do {
+            data = utilitario.leData("Data de início:");
+
+            if ((data.getYear() + 1900) < livro.getAnoPublicacao()) {
+                System.out.println("Data inválida\n");
+                continue;
+            }
+
+            break;
+        } while (true);
 
         return new Aluguel(cpf, titulo, autor, data);
     }
 
-    public Aluguel procuraAluguel(String cpf, String titulo, String autor) {
-        Biblioteca biblioteca = new Biblioteca();
-
-        for (Aluguel aluguel : biblioteca.getAlugueis())
-            if (Objects.equals(aluguel.getCpf(), cpf) &&
-                    Objects.equals(aluguel.getTituloLivro(), titulo) &&
-                    Objects.equals(aluguel.getAutorLivro(), autor) &&
-                    aluguel.isEmCurso())
-                return aluguel;
-
-        return null;
-    }
-
-    public Aluguel finalizaAluguel() {
+    public Aluguel finalizaRegistro() {
         Cliente cliente = new Cliente();
         Livro livro = new Livro();
         String cpf, titulo, autor;
         Aluguel aluguel = new Aluguel();
         Date data;
+        InterfaceUsuario interfaceUsuario = new InterfaceUsuario();
+        Utilitario utilitario = new Utilitario();
 
-        System.out.println("""
-                 * * * * * * * * * * * * * * * * * * * *
-                DEVOLUÇÃO DE LIVRO
-                Preencha os dados abaixo
-                """);
+        interfaceUsuario.exibeCabecalhoFormulario("DEVOLUÇÃO DE LIVRO");
 
-        cpf = cliente.leCpf();
+        cpf = utilitario.leCpf();
         cliente = cliente.procuraCliente(cpf);
 
         if (cliente == null) {
@@ -194,8 +185,8 @@ public class Aluguel {
             return null;
         }
 
-        titulo = livro.leTitulo();
-        autor = livro.leAutor();
+        titulo = utilitario.leTexto("Título");
+        autor = utilitario.leTexto("Autor");
 
         livro = livro.procuraLivro(titulo, autor);
 
@@ -211,7 +202,17 @@ public class Aluguel {
             return null;
         }
 
-        data = leData("término", aluguel.getInicioAluguel(), livro.getAnoPublicacao());
+        do {
+            data = utilitario.leData("Data de término:");
+
+            if (data.before(aluguel.getInicioAluguel())) {
+                System.out.println("Data inválida\n");
+                continue;
+            }
+
+            break;
+        } while (true);
+
         aluguel.setTerminoAluguel(data);
 
         return aluguel;
